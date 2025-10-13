@@ -1,17 +1,50 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { signInWithEmail } from "@/utils/auth";
+import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function LoginScreen() {
-    const router = useRouter();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    return (
-        <View style={styles.container}>
-            <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push("/auth/signup")}
-        >
-        <Text style={styles.buttonText}>signup</Text>
-        </TouchableOpacity>
+  async function onLogin() {
+    try {
+      setLoading(true);
+      await signInWithEmail(email.trim(), password);
+      router.replace("/(tabs)/home");
+    } catch (e: any) {
+      Alert.alert("Login failed", e?.message ?? "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Log in</Text>
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+        autoCapitalize="none"
+        keyboardType="email-address"
+        style={styles.input}
+      />
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        placeholder="Password"
+        secureTextEntry
+        style={styles.input}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={onLogin} disabled={loading}>
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Log in</Text>}
+      </TouchableOpacity>
+
+      <Link href="/(auth)/signup" style={styles.link}>Create an account</Link>
     </View>
   );
 }
@@ -29,10 +62,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  subtitle: {
-    fontSize: 18,
-    color: "#666",
-    marginBottom: 40,
+  input: {
+    width: "90%",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
   },
   button: {
     backgroundColor: "#007AFF",
@@ -46,10 +82,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  secondaryButton: {
-    backgroundColor: "#f2f2f2",
-  },
-  secondaryButtonText: {
-    color: "#333",
-  },
+  link: { color: "#007AFF", marginTop: 8 },
 });
