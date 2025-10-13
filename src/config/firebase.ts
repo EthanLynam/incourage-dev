@@ -1,6 +1,8 @@
-// src/config/firebase.ts
 import { getApps, initializeApp } from 'firebase/app';
 import { browserLocalPersistence, getAuth, setPersistence } from 'firebase/auth';
+// @react-native only
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getReactNativePersistence, initializeAuth } from 'firebase/auth/react-native';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAlKTVAVMOR5rPaHvizX_CdQADPqejF2Us',
@@ -11,11 +13,20 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-// Initialize a single auth instance. Use web persistence only on web.
-const auth = getAuth(app);
-if (typeof window !== 'undefined') {
-  setPersistence(auth, browserLocalPersistence).catch(() => {});
-}
+// Web vs React Native auth init
+let auth = (() => {
+  try {
+    // @ts-expect-error: window is undefined on native
+    if (typeof window !== 'undefined') {
+      const a = getAuth(app);
+      setPersistence(a, browserLocalPersistence);
+      return a;
+    }
+  } catch {}
+  return initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
+})();
 
 export { app, auth };
 
