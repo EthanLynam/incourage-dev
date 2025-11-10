@@ -1,125 +1,63 @@
-import { auth } from "@/firebase-config";
-import { useRouter } from "expo-router";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { auth } from '@/firebase-config';
+import { useRouter } from 'expo-router';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 
-export default function Index() {
+const MIN_DISPLAY_TIME = 1500; // 2.5 seconds in milliseconds
+
+export default function Landing() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState("");
+  const [authStateDetermined, setAuthStateDetermined] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const mountTimeRef = useRef<number>(Date.now());
 
-  const handleSignIn = async () => {
-    try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setAuthStateDetermined(true);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!authStateDetermined) return;
+
+    const elapsed = Date.now() - mountTimeRef.current;
+    const remainingTime = Math.max(0, MIN_DISPLAY_TIME - elapsed);
+
+    const redirectTimer = setTimeout(() => {
       if (user) {
-        router.replace("/(tabs)" as any);
+        router.replace('/home'); // redirect to main app (tab layout)
+      } else {
+        router.replace('/login'); // redirect to login
       }
-      console.log(user);
-    } catch (error: any) {
-      console.error(error);
-      alert('Sign in failed: ' + error.message);
-    }
-  }
+    }, remainingTime);
 
-  const handleSignUp = async () => {
-    try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user) {
-        router.replace("/(tabs)" as any);
-      }
-      console.log(user);
-    } catch (error: any) {
-      console.error(error);
-      alert('Sign up failed: ' + error.message);
-    }
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>LOGIN PAGE</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password"
-          placeholderTextColor="#999"
-          secureTextEntry
-        />
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-/*export default function LandingPage() {
-  const router = useRouter();
+    return () => clearTimeout(redirectTimer);
+  }, [authStateDetermined, user, router]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.push("/login")}>
-        <Text style={styles.buttonText}>Come in</Text>
-      </TouchableOpacity>
+      <Image
+        source={require('@/assets/images/logo.png')}
+        style={styles.logo}
+      />
+      <ActivityIndicator size="large" color="#FFD700" />
     </View>
   );
-}*/
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#151718',
   },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 30,
-    color: "#000",
-  },
-  input: {
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    color: "#000",
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#007AFF",
-    paddingVertical: 15,
-    borderRadius: 8,
-    marginBottom: 12,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
   },
 });
