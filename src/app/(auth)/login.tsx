@@ -1,6 +1,6 @@
 import { auth } from '@/firebase-config';
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,19 +20,6 @@ export default function AuthIndex() {
     } catch (error: any) {
       console.error(error);
       alert('Sign in failed: ' + error.message);
-    }
-  };
-
-  const handleSignUp = async () => {
-    try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user) {
-        router.replace('/home');
-      }
-      console.log(user);
-    } catch (error: any) {
-      console.error(error);
-      alert('Sign up failed: ' + error.message);
     }
   };
 
@@ -60,8 +47,8 @@ export default function AuthIndex() {
         <TouchableOpacity style={styles.button} onPress={handleSignIn}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign Up</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/signup')}>
+          <Text style={styles.buttonText}>Go to Sign Up</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
