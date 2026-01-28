@@ -4,7 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 
-const MIN_DISPLAY_TIME = 1500; // 2.5 seconds in milliseconds
+const MIN_DISPLAY_TIME = 1500; // 1.5 seconds in milliseconds
 
 export default function Landing() {
   const router = useRouter();

@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // COMMENTED OUT: Firestore database functionality
@@ -97,12 +98,18 @@ export default function TabTwoScreen() {
 }
 */
 
-// Simple display with "works" in the middle
-export default function TabTwoScreen() {
+// Simple display with "works" in the middle and settings button
+export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.worksText}>works</Text>
+        <TouchableOpacity 
+          style={styles.settingsButton} 
+          onPress={() => router.push('/(settings)/settings' as any)}
+        >
+          <Text style={styles.buttonText}>Settings</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -122,6 +129,26 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: 'bold',
     color: '#FFD700', // Yellow highlight to match theme
+    marginBottom: 40,
+  },
+  settingsButton: {
+    width: '90%',
+    backgroundColor: '#5C6BC0',
+    padding: 20,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#5C6BC0',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 5,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
   // COMMENTED OUT: Original styles for Firestore functionality
   /*
