@@ -1,22 +1,41 @@
-import { auth } from '@/firebase-config';
+import { auth, db } from '@/firebase-config';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Signup() {
   const router = useRouter();
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignUp = async () => {
     try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user) {
+      const trimmedUsername = username.trim();
+      if (!trimmedUsername) {
+        alert('Please enter a username.');
+        return;
+      }
+
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = credential.user.uid;
+
+      // Template: create a user profile doc in Firestore on signup
+      await setDoc(doc(db, 'users', uid), {
+        uid,
+        username: trimmedUsername,
+        email: credential.user.email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      if (credential) {
         router.replace('/home');
       }
-      console.log(user);
+      console.log(credential);
     } catch (error: any) {
       console.error(error);
       alert('Sign up failed: ' + error.message);
@@ -31,6 +50,14 @@ export default function Signup() {
 
       <View style={styles.content}>
         <Text style={styles.title}>SIGNUP PAGE</Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Username"
+          placeholderTextColor="#999"
+          autoCapitalize="none"
+        />
         <TextInput
           style={styles.input}
           value={email}

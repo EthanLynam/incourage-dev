@@ -12,11 +12,11 @@ export default function AuthIndex() {
 
   const handleSignIn = async () => {
     try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
-      if (user) {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      if (credential) {
         router.replace('/home');
       }
-      console.log(user);
+      console.log(credential);
     } catch (error: any) {
       console.error(error);
       alert('Sign in failed: ' + error.message);
