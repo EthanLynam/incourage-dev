@@ -1,17 +1,11 @@
 // TODO: Accurate error handling alerts for username and password
 
-import { auth, db } from '@/firebase-config';
+import { createUser } from '@/src/services/create-user-service';
+import { isValidUsername } from '@/src/utils/username-val';
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-/* Username: must be 3-20 characters long, cannot contain two consecutive underscores or dots,
- * letters , numbers required, underscores and dots allowed but only between letters and numbers,
- * cannot start or end with an underscore or dot.*/
-const USERNAME_REGEX = /^(?=.{3,20}$)(?!.*[_.]{2})[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$/;
 
 export default function Signup() {
   const router = useRouter();
@@ -21,32 +15,20 @@ export default function Signup() {
 
   const handleSignUp = async () => {
     try {
-      const trimmedUsername = username.trim();
-      if (!trimmedUsername) {
-        alert('Please enter a username.');
-        return;
-      }
-      if (!USERNAME_REGEX.test(trimmedUsername)) {
-        alert('Username cannot contain special characters.');
+      const usernameError = isValidUsername(username);
+
+      if (usernameError) {
+        alert(usernameError);
         return;
       }
 
-      const credential = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = credential.user.uid;
-
-      // Template: create a user profile doc in Firestore on signup
-      await setDoc(doc(db, 'users', uid), {
-        uid,
-        username: trimmedUsername,
-        email: credential.user.email,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+      await createUser({
+        email,
+        password,
+        username: username.trim().toLowerCase(),
       });
 
-      if (credential) {
-        router.replace('/home');
-      }
-      console.log(credential);
+      router.replace('/home');
     } catch (error: any) {
       console.error(error);
       alert('Sign up failed: ' + error.message);
