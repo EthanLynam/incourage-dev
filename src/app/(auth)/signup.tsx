@@ -29,9 +29,11 @@ export default function Signup() {
       });
 
       router.replace('/home');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert('Sign up failed: ' + error.message);
+      const message =
+        error instanceof Error ? error.message : 'Sign up failed.';
+      alert(message.startsWith('Sign up failed') ? message : 'Sign up failed: ' + message);
     }
   };
 
