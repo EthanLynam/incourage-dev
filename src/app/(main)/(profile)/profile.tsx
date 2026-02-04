@@ -1,4 +1,6 @@
+import { getCurrentUserInfo } from '@/src/services/current-user-service';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -99,8 +101,25 @@ export default function TabTwoScreen() {
 */
 
 export default function ProfileScreen() {
-  // TODO: Replace placeholder username and avatar with real user data.
-  const username = 'placeholder_username';
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const info = await getCurrentUserInfo();
+        if (info?.username) {
+          setUsername(info.username);
+        } else {
+          setUsername(null);
+        }
+      } catch (error) {
+        console.error('Failed to load current user info', error);
+        setUsername(null);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -118,7 +137,9 @@ export default function ProfileScreen() {
         {/* Profile row with avatar on the left and username on the right */}
         <View style={styles.profileRow}>
           <View style={styles.avatarPlaceholder} />
-          <Text style={styles.usernameText}>{username}</Text>
+          <Text style={styles.usernameText}>
+            {username ?? 'User'}
+          </Text>
         </View>
       </View>
     </SafeAreaView>
@@ -131,6 +152,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: '#000',
     padding: 20,
   },
   header: {
@@ -161,16 +183,16 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   avatarPlaceholder: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     backgroundColor: '#E0E0E0',
     marginRight: 16,
   },
   usernameText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#000',
+    color: '#FFFFFF',
   },
   worksText: {
     fontSize: 48,
