@@ -1,9 +1,5 @@
 import { auth, db } from '@/firebase-config';
-import {
-  createUserWithEmailAndPassword,
-  deleteUser,
-  UserCredential,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, UserCredential } from 'firebase/auth';
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 
 export interface SignUpParams {
@@ -25,11 +21,8 @@ export const USERNAME_TAKEN_CODE = 'username-taken';
  * Username is stored in lowercase in both `usernames` and `users` collections.
  * @throws Error with message on failure (e.g. auth/email-already-in-use, username-taken)
  */
-export async function createUser({
-  email,
-  password,
-  username,
-}: SignUpParams): Promise<UserCredential> {
+export async function createUser({ email, password, username }: SignUpParams): Promise<UserCredential> {
+
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   const uid = credential.user.uid;
   const usernameLower = username.trim().toLowerCase();

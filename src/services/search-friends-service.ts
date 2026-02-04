@@ -1,3 +1,9 @@
+/**
+ * TODO: security rules within firebase rules file for adding friends etc,
+ * implement requesting and accepting rather than just adding friends,
+ * only allow a friend request to be sent once while it is pending (currently writes everytime add is pressed),
+ */
+
 import { auth, db } from '@/firebase-config';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
@@ -12,9 +18,8 @@ export type SearchFriendResult = {
  * - Returns `null` if username does not exist, maps to current user, or
  *   if the underlying `users/{uid}` doc is missing.
  */
-export async function searchFriendByUsername(
-  rawUsername: string,
-): Promise<SearchFriendResult> {
+export async function searchFriendByUsername( rawUsername: string ): Promise<SearchFriendResult> {
+
   const trimmed = rawUsername.trim().toLowerCase();
   if (!trimmed) return null;
 
@@ -46,6 +51,7 @@ export async function searchFriendByUsername(
  * `users/{currentUid}/friends/{friendUid}` subcollection.
  */
 export async function addFriendByUid(friendUid: string): Promise<void> {
+
   const currentUser = auth.currentUser;
   if (!currentUser) {
     throw new Error('You must be logged in to add friends.');

@@ -98,18 +98,28 @@ export default function TabTwoScreen() {
 }
 */
 
-// Simple display with "works" in the middle and settings button
 export default function ProfileScreen() {
+  // TODO: Replace placeholder username and avatar with real user data.
+  const username = 'placeholder_username';
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.worksText}>works</Text>
-        <TouchableOpacity 
-          style={styles.settingsButton} 
-          onPress={() => router.push('/(settings)/settings' as any)}
-        >
-          <Text style={styles.buttonText}>Settings</Text>
-        </TouchableOpacity>
+        {/* Top-right settings cog button */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.settingsIconButton}
+            onPress={() => router.push('/(settings)/settings' as any)}
+          >
+            <Text style={styles.settingsIconText}>{'\u2699'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Profile row with avatar on the left and username on the right */}
+        <View style={styles.profileRow}>
+          <View style={styles.avatarPlaceholder} />
+          <Text style={styles.usernameText}>{username}</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -121,9 +131,46 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  settingsIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#5C6BC0',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    shadowColor: '#5C6BC0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  settingsIconText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 32,
+  },
+  avatarPlaceholder: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E0E0E0',
+    marginRight: 16,
+  },
+  usernameText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000',
   },
   worksText: {
     fontSize: 48,
