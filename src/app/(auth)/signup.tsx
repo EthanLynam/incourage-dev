@@ -1,7 +1,7 @@
 // TODO: Accurate error handling alerts for username and password
 
 import { createUser } from '@/src/services/create-user-service';
-import { isValidUsername } from '@/src/utils/username-val';
+import { isValidUsername } from '@/src/utils/username-val-utils';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
