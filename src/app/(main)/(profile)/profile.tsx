@@ -1,7 +1,7 @@
 import { getCurrentUserInfo } from '@/src/services/current-user-service';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // COMMENTED OUT: Firestore database functionality
@@ -100,21 +100,27 @@ export default function TabTwoScreen() {
 }
 */
 
+const defaultProfileImage = require('@/assets/images/default-profile-picture.jpg');
+
 export default function ProfileScreen() {
   const [username, setUsername] = useState<string | null>(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const info = await getCurrentUserInfo();
-        if (info?.username) {
+        if (info) {
           setUsername(info.username);
+          setProfilePictureUrl(info.profilePictureUrl);
         } else {
           setUsername(null);
+          setProfilePictureUrl(null);
         }
       } catch (error) {
         console.error('Failed to load current user info', error);
         setUsername(null);
+        setProfilePictureUrl(null);
       }
     };
 
@@ -136,7 +142,17 @@ export default function ProfileScreen() {
 
         {/* Profile row with avatar on the left and username on the right */}
         <View style={styles.profileRow}>
-          <View style={styles.avatarPlaceholder} />
+          <View style={styles.avatarContainer}>
+            <Image
+              source={
+                profilePictureUrl
+                  ? { uri: profilePictureUrl }
+                  : defaultProfileImage
+              }
+              style={styles.avatar}
+              resizeMode="cover"
+            />
+          </View>
           <Text style={styles.usernameText}>
             {username ?? 'User'}
           </Text>
@@ -182,12 +198,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 32,
   },
-  avatarPlaceholder: {
+  avatarContainer: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#E0E0E0',
     marginRight: 16,
+    overflow: 'hidden',
+  },
+  avatar: {
+    width: '100%',
+    height: '100%',
   },
   usernameText: {
     fontSize: 24,

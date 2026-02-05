@@ -45,6 +45,7 @@ export async function createUser({ email, password, username }: SignUpParams): P
         uid,
         username: usernameLower,
         email: credential.user.email,
+        profilePictureUrl: null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
